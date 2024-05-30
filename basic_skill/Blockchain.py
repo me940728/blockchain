@@ -104,7 +104,7 @@ def test_blockchain():
     # 첫 번째 블록에 트랜잭션 추가 및 블록 생성
     blockchain.new_transaction(sender="김상사", recipient="최중위", amount=50)
     blockchain.new_transaction(sender="최중위", recipient="김상사", amount=25)
-    blockchain.new_transaction(sender="최중이", recipient="국군재정단", amount=300)
+    blockchain.new_transaction(sender="최중위", recipient="국군재정단", amount=300)
     last_proof = blockchain.last_block['nonce']
     proof = blockchain.pow(last_proof)
     print('1st Proof : %s' %proof)
@@ -117,8 +117,8 @@ def test_blockchain():
     print("Is blockchain valid(1st)? ", blockchain.valid_chain(blockchain.chain))
     
     # 두 번째 블록에 트랜잭션 추가 및 블록 생성
-    blockchain.new_transaction(sender="Dave", recipient="Eve", amount=20)
-    blockchain.new_transaction(sender="Eve", recipient="Frank", amount=15)
+    blockchain.new_transaction(sender="군수사령부", recipient="1군지여단", amount=20)
+    blockchain.new_transaction(sender="군수사령부", recipient="2군지여단", amount=15)
     last_proof = blockchain.last_block['nonce']
     proof = blockchain.pow(last_proof)
     print('2nd Proof : %s' %proof)
@@ -132,8 +132,8 @@ def test_blockchain():
     print("Is blockchain valid(2nd)? ", blockchain.valid_chain(blockchain.chain))
 
     # 세 번째 블록에 트랜잭션 추가 및 블록 생성
-    blockchain.new_transaction(sender="George", recipient="Harry", amount=10)
-    blockchain.new_transaction(sender="Harry", recipient="Isabella", amount=5)
+    blockchain.new_transaction(sender="국군재정단", recipient="8사단", amount=10)
+    blockchain.new_transaction(sender="계룡대근지단", recipient="왕상사", amount=5)
     last_proof = blockchain.last_block['nonce']
     proof = blockchain.pow(last_proof)
     print('3rd Proof : %s' %proof)
