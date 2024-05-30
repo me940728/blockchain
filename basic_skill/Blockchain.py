@@ -1,6 +1,6 @@
 import hashlib
 import json
-from time import time
+from time import time, localtime, strftime
 import random
 import requests
 from flask import Flask, request, jsonify
@@ -51,7 +51,7 @@ class Blockchain(object):
                 'sender' : sender, # 송신자
                 'recipient' : recipient, # 수신자
                 'amount' : amount, #금액
-                'timestamp' : time() #작업 시간
+                'timestamp' : strftime( '%Y-%m-%d %H:%M:%S', localtime( time() ) ), #작업 시간 기존 time() 1970년 이후 시간으로 가독성 떨어져 수정함
             }
         )
         return self.last_block['index'] + 1 # 마지막 블록의 인덱스에 하나 큰 값으로 추가함
@@ -62,7 +62,7 @@ class Blockchain(object):
     def new_block(self, proof, previous_hash=None): # 기본값 None
         block = {
             'index': len(self.chain) + 1, # 블록 번호
-            'timestamp': time(), # 생성 시간
+            'timestamp': strftime( '%Y-%m-%d %H:%M:%S', localtime( time() ) ), # 생성 시간
             'transaction': self.current_transaction, # 거래 내역
             'nonce': proof, # 검증된 넌스 값
             'previous_hash': previous_hash or self.hash(self.chain[-1]) # None이 아니면 매개변수 그대로 사용 None이면 마지막 체인 값 사용
@@ -100,6 +100,7 @@ def test_blockchain():
     # 새로운 거래 추가
     blockchain.new_transaction(sender="Alice", recipient="Bob", amount=50)
     blockchain.new_transaction(sender="Bob", recipient="Charlie", amount=25)
+    blockchain.new_transaction(sender="Choi", recipient="Charlie", amount=30)
 
     # 작업 증명 및 블록 추가
     last_proof = blockchain.last_block['nonce']
@@ -108,16 +109,21 @@ def test_blockchain():
 
     # 체인 상태 출력
     for block in blockchain.chain:
-        print(block)
+        print("Block : %s" %block, '\n')
 
     # 체인 유효성 검사
     is_valid = blockchain.valid_chain(blockchain.chain)
     print("Is blockchain valid?", is_valid)
 
     # 의도적으로 체인 변조 후 유효성 검사
-    blockchain.chain[1]['transaction'][0]['amount'] = 9999
-    is_valid_after_tampering = blockchain.valid_chain(blockchain.chain)
-    print("Is blockchain valid after tampering?", is_valid_after_tampering)
+    print('blockchain.chain leng : %s' % len( blockchain.chain), '\n')
+    print('blockchain.chain val : \n %s' % blockchain.chain, '\n' )
+    
+    blockchain.chain[1]['transaction'][2]['amount'] = 9999 # Choi 의 거래가격 위조
+    print('\n')
+    current_chain = hashlib.sha256(json.dumps(blockchain.chain[-1], sort_keys=True).encode() ).hexdigest()
+    last_chain =  blockchain.chain[-1][2]
+    print('Err : %s')
 
 if __name__ == "__main__":
     test_blockchain()

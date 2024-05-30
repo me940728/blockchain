@@ -1,6 +1,6 @@
 import hashlib
 import json
-from time import time
+from time import time, localtime, strftime
 
 class Blockchain(object):
     
@@ -106,5 +106,10 @@ def test_blockchain():
     is_valid_after_tampering = blockchain.valid_chain(blockchain.chain)
     print("Is blockchain valid after tampering?", is_valid_after_tampering)
 
-if __name__ == "__main__":
-    test_blockchain()
+def time_test():
+    # 현지 시간을 사람이 읽을 수 있는 형식으로 변환
+    formatted_time = strftime( '%Y-%m-%d %H:%M:%S', localtime( time() ) )
+
+    print("현재 시간:", formatted_time)
+    
+time_test()
