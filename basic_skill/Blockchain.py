@@ -80,10 +80,12 @@ class Blockchain(object):
         while current_index < len(chain):
             block = chain[current_index]
             print('[%s] Last Block: %s' % (current_index - 1, last_block))
-            print('[%s] Current Block: %s' % (current_index, block))
-            print("\n[%s]-----------\n" % current_index)
+            print('[%s] Current Block: %s' % (current_index - 1, block))
+            print(" -block[previous_hash] %s \n -last_block %s" %( block['previous_hash'], self.hash(last_block)) )
+            print("\n[%s]-----------------------------------\n" % current_index)
             
-            if block['previous_hash'] != self.hash(last_block):
+            # 현재 기준 이전 블록 해시 정보와 블록 해시값 비교
+            if block['previous_hash'] != self.hash(last_block): 
                 return False
 
             last_block = block
@@ -91,8 +93,7 @@ class Blockchain(object):
 
         return True
 
-    
-# 4.5.27 최별규 -> 블록 검증테스트 코드 작성 
+# 24.5.27 최별규 -> 블록 검증테스트 코드 작성 
 # [UPDATE] Block을 하나만 생성하니 위변조 시 테스트하면 항상 True를 반환하여 블록을 n개 생성하도록 수정하였음
 def test_blockchain():
     # 블록체인 객체 생성
@@ -113,7 +114,7 @@ def test_blockchain():
     # 첫 번째 블록 생성 후 블록 검증하기
     print('blockchain.chain => \n %s' %blockchain.chain)
     for block in blockchain.chain:
-        print("Block : %s" %block, '\n')
+        print("\nBlock : %s" %block, '\n')
     print("Is blockchain valid(1st)? ", blockchain.valid_chain(blockchain.chain))
     
     # 두 번째 블록에 트랜잭션 추가 및 블록 생성
@@ -128,7 +129,7 @@ def test_blockchain():
     blockchain.chain[1]['transaction'][2]['amount'] = 9999 # Choi 의 거래가격 위조 => 의도적인 체인 변조
     print('blockchain.chain => \n %s' %blockchain.chain)
     for block in blockchain.chain:
-        print("Block : %s" %block, '\n')
+        print("\nBlock : %s" %block, '\n')
     print("Is blockchain valid(2nd)? ", blockchain.valid_chain(blockchain.chain))
 
     # 세 번째 블록에 트랜잭션 추가 및 블록 생성
@@ -142,7 +143,7 @@ def test_blockchain():
     # 세번째 블록 생성 후 블록 검증하기(앞서 두번째 블록에서 변조 발생)
     print('blockchain.chain => \n %s' %blockchain.chain)
     for block in blockchain.chain:
-        print("Block : %s" %block, '\n')
+        print("\nBlock : %s" %block, '\n')
     print("Is blockchain valid(3rd)? ", blockchain.valid_chain(blockchain.chain))
 
 if __name__ == "__main__":
