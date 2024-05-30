@@ -34,15 +34,15 @@ class Blockchain(object):
     # 24.5.27 최별규 -> 작업 증명
     def pow(self, last_proof):
         # 무작위 방식의 채굴
-        #proof = random.randint(-1000000, 1000000) # -10만 10만 사이 무작위 정수를 추출
-        #while self.valid_proof(last_proof, proof) is False: # 유요한 난스값인지 비교하여 유요한 난스값이면 올바른 난스값을 반환한다.
-        #    proof = random.randint(-1000000, 1000000)
-        #return proof
-        # 증분을 통한 넌스값 채굴
-        proof = 0
-        while not self.valid_proof(last_proof, proof): # 유효한 넌스값인지 비교하여 유효한 넌스값이면 올바른 넌스값을 반환한다.
-            proof += 1
+        proof = random.randint(-1000000, 1000000) # -10만 10만 사이 무작위 정수를 추출
+        while self.valid_proof(last_proof, proof) is False: # 유요한 난스값인지 비교하여 유요한 난스값이면 올바른 난스값을 반환한다.
+            proof = random.randint(-1000000, 1000000)
         return proof
+        # 증분을 통한 넌스값 채굴
+        #proof = 0
+        #while not self.valid_proof(last_proof, proof): # 유효한 넌스값인지 비교하여 유효한 넌스값이면 올바른 넌스값을 반환한다.
+        #    proof += 1
+        #return proof
     
     # 24.5.27 최별규 -> 거래내역 추가 함수 -> 매번 블록이 생성되기 전까지 지속적으로 예비 블록 내 작업이 append 된다.
     def new_transaction(self, sender, recipient, amount):
@@ -76,20 +76,24 @@ class Blockchain(object):
     def valid_chain(self, chain):
         last_block = chain[0]
         current_index = 1
-        
+
         while current_index < len(chain):
             block = chain[current_index]
-            print('Last Block: %s' % last_block)
-            print('Current Block: %s' % block)
-            print("\n-----------\n")
+            print('[%s] Last Block: %s' % (current_index - 1, last_block))
+            print('[%s] Current Block: %s' % (current_index, block))
+            print("\n[%s]-----------\n" % current_index)
             
             if block['previous_hash'] != self.hash(last_block):
                 return False
 
             last_block = block
             current_index += 1
+
         return True
-# 테스트 코드 작성
+
+    
+# 4.5.27 최별규 -> 블록 검증테스트 코드 작성 
+# [UPDATE] Block을 하나만 생성하니 위변조 시 테스트하면 항상 True를 반환하여 블록을 n개 생성하도록 수정하였음
 def test_blockchain():
     # 블록체인 객체 생성
     blockchain = Blockchain()
@@ -97,33 +101,49 @@ def test_blockchain():
     # 제네시스 블록 확인
     print("Genesis Block:", blockchain.chain[0])
 
-    # 새로운 거래 추가
-    blockchain.new_transaction(sender="Alice", recipient="Bob", amount=50)
-    blockchain.new_transaction(sender="Bob", recipient="Charlie", amount=25)
-    blockchain.new_transaction(sender="Choi", recipient="Charlie", amount=30)
-
-    # 작업 증명 및 블록 추가
+    # 첫 번째 블록에 트랜잭션 추가 및 블록 생성
+    blockchain.new_transaction(sender="김상사", recipient="최중위", amount=50)
+    blockchain.new_transaction(sender="최중위", recipient="김상사", amount=25)
+    blockchain.new_transaction(sender="최중이", recipient="국군재정단", amount=300)
     last_proof = blockchain.last_block['nonce']
     proof = blockchain.pow(last_proof)
+    print('1st Proof : %s' %proof)
     blockchain.new_block(proof)
-
-    # 체인 상태 출력
+    
+    # 첫 번째 블록 생성 후 블록 검증하기
+    print('blockchain.chain => \n %s' %blockchain.chain)
     for block in blockchain.chain:
         print("Block : %s" %block, '\n')
-
-    # 체인 유효성 검사
-    is_valid = blockchain.valid_chain(blockchain.chain)
-    print("Is blockchain valid?", is_valid)
-
-    # 의도적으로 체인 변조 후 유효성 검사
-    print('blockchain.chain leng : %s' % len( blockchain.chain), '\n')
-    print('blockchain.chain val : \n %s' % blockchain.chain, '\n' )
+    print("Is blockchain valid(1st)? ", blockchain.valid_chain(blockchain.chain))
     
-    blockchain.chain[1]['transaction'][2]['amount'] = 9999 # Choi 의 거래가격 위조
-    print('\n')
-    current_chain = hashlib.sha256(json.dumps(blockchain.chain[-1], sort_keys=True).encode() ).hexdigest()
-    last_chain =  blockchain.chain[-1][2]
-    print('Err : %s')
+    # 두 번째 블록에 트랜잭션 추가 및 블록 생성
+    blockchain.new_transaction(sender="Dave", recipient="Eve", amount=20)
+    blockchain.new_transaction(sender="Eve", recipient="Frank", amount=15)
+    last_proof = blockchain.last_block['nonce']
+    proof = blockchain.pow(last_proof)
+    print('2nd Proof : %s' %proof)
+    blockchain.new_block(proof)
+    
+    # 두번째 블록 생성 후 블록 검증하기 위변조 시나리오
+    blockchain.chain[1]['transaction'][2]['amount'] = 9999 # Choi 의 거래가격 위조 => 의도적인 체인 변조
+    print('blockchain.chain => \n %s' %blockchain.chain)
+    for block in blockchain.chain:
+        print("Block : %s" %block, '\n')
+    print("Is blockchain valid(2nd)? ", blockchain.valid_chain(blockchain.chain))
+
+    # 세 번째 블록에 트랜잭션 추가 및 블록 생성
+    blockchain.new_transaction(sender="George", recipient="Harry", amount=10)
+    blockchain.new_transaction(sender="Harry", recipient="Isabella", amount=5)
+    last_proof = blockchain.last_block['nonce']
+    proof = blockchain.pow(last_proof)
+    print('3rd Proof : %s' %proof)
+    blockchain.new_block(proof)
+
+    # 세번째 블록 생성 후 블록 검증하기(앞서 두번째 블록에서 변조 발생)
+    print('blockchain.chain => \n %s' %blockchain.chain)
+    for block in blockchain.chain:
+        print("Block : %s" %block, '\n')
+    print("Is blockchain valid(3rd)? ", blockchain.valid_chain(blockchain.chain))
 
 if __name__ == "__main__":
     test_blockchain()
