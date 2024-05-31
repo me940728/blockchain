@@ -18,5 +18,7 @@ while True:
         nonce = nonce_result                                                   
         break
     i += 1
+    
+
 
 

@@ -4,6 +4,8 @@ from time import time, localtime, strftime
 import random
 import requests
 from flask import Flask, request, jsonify
+# 24.5.31 교수님 리뷰 : 블록이 생성 > 타 노드 전달
+# 노드 생성 후
 
 class Blockchain(object):
     
@@ -27,9 +29,9 @@ class Blockchain(object):
     # 24.5.27 최별규 -> 검증 작업 why? 마지막 넌스와 새로운 넌스를 조합하여 첫 4자리가 0000이면 유효(valid)하다고 판단한다.
     @staticmethod
     def valid_proof(last_proof, proof):
-        guess = str(last_proof + proof).encode()
+        guess = str(last_proof + proof).encode() # => 이전 블록의 넌스(넌스는 난이도다)를 가져와서 현재 넌스를 사용하는 것이 일반적인가?
         guess_hash = hashlib.sha256(guess).hexdigest()
-        return guess_hash[:4] == "0000" # Ture or False 
+        return guess_hash[:4] == "0000" # Ture or False => 넌스값 이하(비트코인)가 아닌 특정 기준에 의한 분기
     
     # 24.5.27 최별규 -> 작업 증명
     def pow(self, last_proof):
@@ -84,7 +86,7 @@ class Blockchain(object):
             print(" -block[previous_hash] %s \n -last_block %s" %( block['previous_hash'], self.hash(last_block)) )
             print("\n[%s]-----------------------------------\n" % current_index)
             
-            # 현재 기준 이전 블록 해시 정보와 블록 해시값 비교
+            # 현재 기준 => 가지고 있는 이전 해시값과 실제 블록을 해시한 값이 다를 경우 False 반환
             if block['previous_hash'] != self.hash(last_block): 
                 return False
 
