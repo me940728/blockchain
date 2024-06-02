@@ -1,5 +1,9 @@
 import importlib.util
 import sys, os
+import flask
+from importlib.metadata import version # 버전 확인용 라이브러리 임포트
+#flask_version = version("flask")
+#print(f"Flask version: {flask_version}")
 '''
 싱글노드 상태에서 블록체인 테스트를 위한 파이썬 파일 입니다. 
 conda env blockchain
