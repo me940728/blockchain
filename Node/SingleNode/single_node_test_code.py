@@ -19,6 +19,16 @@ spec.loader.exec_module(module)
 Blockchain = module.Blockchain
 blockchain = Blockchain
 
+# 운영할 노드의 key 값 설정(node_identify, 노드 IP + 포트 번호)
+my_ip = '0.0.0.0'
+my_port = '5000'
+node_identify = 'node_' + my_port
+mine_owner = 'master'
+mine_profit = 0.1
+
+'''
+# 실행 테스트
 if __name__ == "__main__":
     obj = blockchain()
     obj.module_test()
+'''
